@@ -146,10 +146,10 @@ def train_step(model, config, rng, state, batch, lr):
 
 def main(unused_argv):
   rng = random.PRNGKey(20200823)
-  # Shift the numpy random seed by host_id() to shuffle data loaded by different
-  # hosts.
-  np.random.seed(20201473 + jax.host_id())
-
+  # # Shift the numpy random seed by host_id() to shuffle data loaded by different
+  # # hosts.
+  # np.random.seed(20201473 + jax.host_id())
+  # rng = 
   config = utils.load_config()
 
   if config.batch_size % jax.device_count() != 0:
@@ -218,6 +218,7 @@ def main(unused_argv):
   gc.disable()  # Disable automatic garbage collection for efficiency.
   stats_trace = []
   reset_timer = True
+  first_test = True
   for step, batch in zip(range(init_step, config.max_steps + 1), pdataset):
     if reset_timer:
       t_loop_start = time.time()
@@ -278,7 +279,8 @@ def main(unused_argv):
             FLAGS.train_dir, state_to_save, int(step), keep=100)
 
     # Test-set evaluation.
-    if FLAGS.render_every > 0 and step % FLAGS.render_every == 0:
+    if first_test or (FLAGS.render_every > 0 and step % FLAGS.render_every == 0):
+      first_test = False
       # We reuse the same random number generator from the optimization step
       # here on purpose so that the visualization matches what happened in
       # training.

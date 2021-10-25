@@ -61,6 +61,15 @@ You can generate the multiscale dataset used in the paper by running the followi
 python scripts/convert_blender_data.py --blenderdir /nerf_synthetic --outdir /multiscale
 ```
 
+### For NViSII data
+
+This creates a mip folder inside, turns the exr images into png and creates
+the substructure needed to train. 
+
+```
+python scripts/convert_ndds_data.py --blenderdir /path to the folder/ 
+```
+
 ## Running
 
 Example scripts for training mip-NeRF on individual scenes from the three
@@ -75,16 +84,18 @@ paper.
 
 
 ```
-XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda/ sh scripts/train_blender.sh 
+XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda-11.4/ sh scripts/train_blender.sh 
 ```
+Do not forget to install CuDNN
+
 Added this to the config file
 
-
-### OOM errors
-You may need to reduce the batch size to avoid out of memory errors. For example the model can be run on a NVIDIA 3080 (10Gb) using the following flag. 
 ```
 --gin_param="Config.batch_size = 1024"
 ```
+
+### OOM errors
+You may need to reduce the batch size to avoid out of memory errors. For example the model can be run on a NVIDIA 3080 (10Gb) using the following flag. 
 
 ## Citation
 If you use this software package, please cite our paper:

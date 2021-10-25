@@ -1,2 +1,3 @@
 Config.dataset_loader = 'blender'
 Config.batching = 'single_image'
+Config.batch_size = 2000
