@@ -73,6 +73,13 @@ in `scripts/`, after which you can use `scripts/summarize.ipynb` to produce
 error metrics across all scenes in the same format as was used in tables in the
 paper.
 
+
+```
+XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda/ sh scripts/train_blender.sh 
+```
+Added this to the config file
+
+
 ### OOM errors
 You may need to reduce the batch size to avoid out of memory errors. For example the model can be run on a NVIDIA 3080 (10Gb) using the following flag. 
 ```
