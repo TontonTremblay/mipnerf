@@ -223,7 +223,7 @@ def main(unused_argv):
       json.dump(out_test, outfile, indent=2)
 
   # make the png files
-  raise()
+  # raise()
   def linear_to_srgb(img):
     limit = 0.0031308
     img = np.where(img > limit, 1.055 * (img ** (1.0 / 2.4)) - 0.055, 12.92 * img)
@@ -275,8 +275,8 @@ def main(unused_argv):
   near = near - near*.2
   far = far + far*.2
   print(near,far)
-  # near = 0.3694779872894287 
-  # far  = 1.2352559566497803
+  # near = 0.01 
+  # far  = 3
 
   # raise() 
   # blenderdir = blenderdir + "/mip"
