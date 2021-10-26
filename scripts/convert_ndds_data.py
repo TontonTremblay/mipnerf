@@ -187,7 +187,30 @@ def main(unused_argv):
                             [c2w[0][3],c2w[1][3],c2w[2][3],c2w[3][3]]]  
     out['frames'].append(fr)
 
-  out_train['camera_angle_x']=0.785398
+  out_train['aabb'] = [
+    [
+      data['camera_data']['scene_min_3d_box'][0],
+      data['camera_data']['scene_min_3d_box'][1],
+      data['camera_data']['scene_min_3d_box'][2],
+    ],
+    [
+      data['camera_data']['scene_max_3d_box'][0],
+      data['camera_data']['scene_max_3d_box'][1],
+      data['camera_data']['scene_max_3d_box'][2],
+    ],
+  ]
+  out_test['aabb'] = out_train['aabb']
+  out_val['aabb'] = out_train['aabb']
+
+  cx = data['camera_data']['intrinsics']['cx']
+  fx = data['camera_data']['intrinsics']['fx']
+
+  import math
+  camang = math.atan((cx/2)/(fx/2))*2
+  # camang = 0.5*1600/np.tan(0.5*camang)
+  # print(camang)
+  # raise()
+  out_train['camera_angle_x']= camang 
   out_test['camera_angle_x'] = out_train['camera_angle_x']
   out_val['camera_angle_x'] = out_train['camera_angle_x']
 
@@ -200,7 +223,7 @@ def main(unused_argv):
       json.dump(out_test, outfile, indent=2)
 
   # make the png files
-
+  raise()
   def linear_to_srgb(img):
     limit = 0.0031308
     img = np.where(img > limit, 1.055 * (img ** (1.0 / 2.4)) - 0.055, 12.92 * img)
@@ -226,8 +249,8 @@ def main(unused_argv):
       continue
     png_file_name = image.split('/')[-1].replace(".exr",'')
 
-    if os.path.isfile(f"{outdir}/{folder_name}/{png_file_name}.png"):
-      continue
+    # if os.path.isfile(f"{outdir}/{folder_name}/{png_file_name}.png"):
+    #   continue
     # raise()
     i_file_name += 1
     if i_file_name>=100 and i_file_name<105:

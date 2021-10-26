@@ -17,9 +17,11 @@
 
 SCENE=lego
 EXPERIMENT=debug
-TRAIN_DIR=/home/jtremblay/code/mipnerf/lego_v8
+TRAIN_DIR=/home/jtremblay/code/mipnerf/lego_v8/
 DATA_DIR=/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/nvisii_mvs_10/lego/V8/mip/
+# DATA_DIR=/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/falling_google_scenes/00000/mip/
 
+mkdir $TRAIN_DIR
 rm $TRAIN_DIR/*
 python -m train \
   --data_dir=$DATA_DIR \
