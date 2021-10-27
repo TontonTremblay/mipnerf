@@ -220,6 +220,8 @@ class Multicam(Dataset):
     with utils.open_file(path.join(self.data_dir, 'metadata.json'),
                          'r') as fp:
       self.meta = json.load(fp)[self.split]
+    # print('hello')
+    # raise()
     self.meta = {k: np.array(self.meta[k]) for k in self.meta}
     # should now have ['pix2cam', 'cam2world', 'width', 'height'] in self.meta
     images = []
@@ -319,6 +321,7 @@ class Blender(Dataset):
         path.join(self.data_dir, 'transforms_{}.json'.format(self.split)),
         'r') as fp:
       meta = json.load(fp)
+
     images = []
     cams = []
     for i in range(len(meta['frames'])):
@@ -337,18 +340,24 @@ class Blender(Dataset):
       images.append(image)
     self.images = np.stack(images, axis=0)
     if config.white_bkgd:
+      print('hello')
+      # raise()
       self.images = (
           self.images[..., :3] * self.images[..., -1:] +
           (1. - self.images[..., -1:]))
     else:
+      print('no')
+      # raise()
       self.images = self.images[..., :3]
     self.h, self.w = self.images.shape[1:3]
     self.resolution = self.h * self.w
+    print(self.resolution,self.h,self.w)
     self.camtoworlds = np.stack(cams, axis=0)
     camera_angle_x = float(meta['camera_angle_x'])
     self.focal = .5 * self.w / np.tan(.5 * camera_angle_x)
     self.n_examples = self.images.shape[0]
-
+    print(self.n_examples)
+    raise()
 
 class LLFF(Dataset):
   """LLFF Dataset."""
