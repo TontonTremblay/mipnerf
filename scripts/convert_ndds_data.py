@@ -137,7 +137,7 @@ def main(unused_argv):
   blenderdir = FLAGS.blenderdir
   outdir = FLAGS.outdir
   n_down = FLAGS.n_down
-  outdir = blenderdir + '/' + outdir 
+  # outdir = blenderdir + '/' + outdir 
   if not os.path.exists(outdir):
     os.makedirs(outdir)
 
@@ -307,8 +307,8 @@ def main(unused_argv):
     print()
     # newdir = os.path.join(outdir, os.path.basename(basedir))
     newdir = basedir
-    print('Converting from', basedir, 'to', newdir)
-    convert_to_nerfdata(basedir, newdir, n_down, near_far = [near,far])
+    print('Converting from', outdir, 'to', outdir)
+    convert_to_nerfdata(outdir, outdir, n_down, near_far = [near,far])
 
 
 if __name__ == '__main__':
