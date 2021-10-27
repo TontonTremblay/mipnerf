@@ -17,7 +17,8 @@
 
 SCENE=lego
 EXPERIMENT=debug
-TRAIN_DIR=/home/jtremblay/code/mipnerf/test
+TRAIN_DIR=/home/jtremblay/code/mipnerf/lego_nerf
+
 DATA_DIR=/home/jtremblay/code/mipnerf/multiplescale/lego/
 
 rm $TRAIN_DIR/*

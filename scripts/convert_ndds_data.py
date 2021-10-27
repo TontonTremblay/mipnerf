@@ -28,6 +28,7 @@ def load_renderings(data_dir, split):
     meta = json.load(fp)
   images = []
   cams = []
+  # raise()
   print('Loading imgs')
   for frame in meta['frames']:
     fname = os.path.join(data_dir, frame['file_path'] + '.png')
@@ -41,6 +42,7 @@ def load_renderings(data_dir, split):
   ret['camtoworlds'] = np.stack(cams, axis=0)
   w = ret['images'].shape[2]
   camera_angle_x = float(meta['camera_angle_x'])
+  print()
   ret['focal'] = .5 * w / np.tan(.5 * camera_angle_x)
   return ret
 
@@ -206,11 +208,25 @@ def main(unused_argv):
   fx = data['camera_data']['intrinsics']['fx']
 
   import math
-  camang = math.atan((cx/2)/(fx/2))*2
-  # camang = 0.5*1600/np.tan(0.5*camang)
+  # camang = math.atan((cx/4)/(fx/4))*2
+  print('for 1600')
+  print('fx',fx)
+  print("fov",math.atan((1600/(2*fx)))*2)
+
+  print('for 800')
+  fx/=2 
+  print('fx',fx)
+  print("fov",math.atan((800/(2*fx)))*2)
+
+
+  # camang = math.atan((800/(2*fx)))*2
+
+  # print('fx',fx,0.5*1600/np.tan(0.5*camang),.5 * 800 / np.tan(.5 * camang))
+  # print(0.785398)
   # print(camang)
   # raise()
-  out_train['camera_angle_x']= camang 
+
+  out_train['camera_angle_x']= math.atan((800/(2*fx)))*2 
   out_test['camera_angle_x'] = out_train['camera_angle_x']
   out_val['camera_angle_x'] = out_train['camera_angle_x']
 
