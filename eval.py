@@ -75,6 +75,10 @@ def main(unused_argv):
   ssim_fn = jax.jit(functools.partial(math.compute_ssim, max_val=1.))
 
   last_step = 0
+  print(FLAGS.train_dir)
+  print(config.render_path)
+  print('test_preds')
+
   out_dir = path.join(FLAGS.train_dir,
                       'path_renders' if config.render_path else 'test_preds')
   if not FLAGS.eval_once:
@@ -95,6 +99,8 @@ def main(unused_argv):
     for idx in range(dataset.size):
       print(f'Evaluating {idx+1}/{dataset.size}')
       batch = next(dataset)
+      print(batch.keys())
+      raise()
       pred_color, pred_distance, pred_acc = models.render_image(
           functools.partial(render_eval_pfn, state.optimizer.target),
           batch['rays'],

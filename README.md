@@ -86,6 +86,11 @@ paper.
 ```
 XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda-11.4/ sh scripts/train_blender.sh 
 ```
+
+```
+XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda-11.4/ python train.py --data_dir=/home/jtremblay/tmp_test/ --train_dir=lego_test/ --gin_file=configs/multiblender.gin --logtostderr
+```
+
 Do not forget to install CuDNN
 
 Added this to the config file

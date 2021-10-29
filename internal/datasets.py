@@ -168,9 +168,11 @@ class Dataset(threading.Thread):
     if self.render_path:
       return {'rays': utils.namedtuple_map(lambda r: r[idx], self.render_rays)}
     else:
+      print(self.names[idx])
       return {
           'pixels': self.images[idx],
-          'rays': utils.namedtuple_map(lambda r: r[idx], self.rays)
+          'rays': utils.namedtuple_map(lambda r: r[idx], self.rays),
+          'file_name':self.names[idx]
       }
 
   # TODO(bydeng): Swap this function with a more flexible camera model.
@@ -220,20 +222,26 @@ class Multicam(Dataset):
     with utils.open_file(path.join(self.data_dir, 'metadata.json'),
                          'r') as fp:
       self.meta = json.load(fp)[self.split]
-    # print('hello')
-    # raise()
+
     self.meta = {k: np.array(self.meta[k]) for k in self.meta}
     # should now have ['pix2cam', 'cam2world', 'width', 'height'] in self.meta
     images = []
-    for fbase in self.meta['file_path']:
+    names = []
+    for i_file,fbase in enumerate(self.meta['file_path']):
       fname = os.path.join(self.data_dir, fbase)
       with utils.open_file(fname, 'rb') as imgin:
         image = np.array(Image.open(imgin), dtype=np.float32) / 255.
+
       if config.white_bkgd:
         image = image[..., :3] * image[..., -1:] + (1. - image[..., -1:])
-      images.append(image[..., :3])
+
+      if image.shape[0] == 400:
+        images.append(image[..., :3])
+        names.append(fbase.split("/")[-1])
+
     self.images = images
     self.n_examples = len(self.images)
+    self.names=names
 
   def _train_init(self, config):
     """Initialize training."""
