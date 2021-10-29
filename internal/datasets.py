@@ -168,11 +168,11 @@ class Dataset(threading.Thread):
     if self.render_path:
       return {'rays': utils.namedtuple_map(lambda r: r[idx], self.render_rays)}
     else:
-      print(self.names[idx])
+      name = int(self.names[idx].split("_")[0])
       return {
           'pixels': self.images[idx],
           'rays': utils.namedtuple_map(lambda r: r[idx], self.rays),
-          'file_name':self.names[idx]
+          'file_num':self.names[idx]
       }
 
   # TODO(bydeng): Swap this function with a more flexible camera model.
