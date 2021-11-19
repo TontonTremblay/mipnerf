@@ -80,7 +80,7 @@ def main(unused_argv):
   print(config.render_path)
   print('test_preds')
 
-  folder = 'test_500k'
+  folder = 'video'
   subprocess.call(['mkdir',f'{FLAGS.train_dir}/{folder}/'])
 
 
@@ -103,18 +103,108 @@ def main(unused_argv):
     psnr_values = []
     ssim_values = []
     avg_values = []
+
     if not FLAGS.eval_once:
       showcase_index = random.randint(random.PRNGKey(step), (), 0, dataset.size)
-    for idx in range(dataset.size):
+    
+
+    with open('poses_lego.npy', 'rb') as f:
+      poses = np.load(f)    
+    for i in range(10):
       batch = next(dataset)
-      if not batch['res'] == 400:
-        continue
-      print(f'Evaluating {idx+1}/{dataset.size}',batch['file_num'])
+      if batch['res'] == 800:
+        break
+    # for idx in range(dataset.size):
+
+    def generate_rays(camtoworlds,w=800,h=800,focal=0.785398/2,
+                      near=0.1,far=1):
+
+      """Generating rays for all images."""
+      x, y = np.meshgrid(  # pylint: disable=unbalanced-tuple-unpacking
+          np.arange(w, dtype=np.float32),  # X-Axis (columns)
+          np.arange(h, dtype=np.float32),  # Y-Axis (rows)
+          indexing='xy')
+
+      camera_dirs = np.stack(
+          [(x - w * 0.5 + 0.5) / focal,
+           -(y - h * 0.5 + 0.5) / focal, -np.ones_like(x)],
+          axis=-1)
+      
+      # print(camera_dirs[None, ..., None, :].shape)
+      # print(camtoworlds[None,None, None, None, :3, -1].shape)
+      # raise()
+
+      directions = ((camera_dirs[None, ..., None, :] \
+        * camtoworlds[None,None, None, None, :3, :3]).sum(axis=-1))
+      origins = np.broadcast_to(camtoworlds[None,None, None, None, :3, -1],
+                                directions.shape)
+      # print(directions.shape)
+      # print(origins.shape)
+      # raise()
+
+      # directions = ((camera_dirs[None, ..., None, :] *
+      #                camtoworlds[:, None, None, :3, :3]).sum(axis=-1))
+      # origins = np.broadcast_to(camtoworlds[:, None, None, :3, -1],
+      #                           directions.shape)
+
+      # print(camera_dirs[None, ..., None, :].shape)
+
+
+
+
+      viewdirs = directions / np.linalg.norm(directions, axis=-1, keepdims=True)
+
+      # print(viewdirs.shape)
+      # print(directions.shape)
+      # print(directions[:, 0, :, :].shape)
+      # raise()
+
+      # # Distance from each unit-norm direction vector to its x-axis neighbor.
+      # # dx = np.sqrt(
+      # #     np.sum((directions[:, :-1, :, :] - directions[:, 1:, :, :])**2, -1))
+      # dx = np.sqrt(
+      #     np.sum((directions[:, 0, :, :] - directions[:, 0, :, :])**2, -1))
+
+      # dx = np.concatenate([dx, dx[:, -2:-1, :]], 1)
+      # # Cut the distance in half, and then round it out so that it's
+      # # halfway between inscribed by / circumscribed about the pixel.
+
+      # print(dx.shape)
+      # radii = dx[..., None] * 2 / np.sqrt(12)
+      # print(radii.shape)
+      # raise()
+      ones = np.ones_like(origins[..., :1])
+
+      # raise()
+
+      return utils.Rays(
+          origins=origins.reshape((w, h,-1)),
+          directions=directions.reshape((w, h,-1)),
+          viewdirs=viewdirs.reshape((w, h,-1)),
+          # radii=radii.reshape((w, h,-1)),
+          radii = (ones * 1/(2*np.sqrt(12))).reshape((w, h,-1)),
+          lossmult=ones.reshape((w, h,-1)),
+          near=(ones * near).reshape((w, h,-1)),
+          far=(ones * far).reshape((w, h,-1))
+        )
+
+
+
+    for i_pose, pose in enumerate(poses):
+      # batch = next(dataset)
+
+      # print(f'Evaluating {idx+1}/{dataset.size}',batch['file_num'])
+      # print(batch['rays'])
+      
       pred_color, pred_distance, pred_acc = models.render_image(
           functools.partial(render_eval_pfn, state.optimizer.target),
-          batch['rays'],
-          None,
-          chunk=FLAGS.chunk)
+          # batch['rays'],
+          generate_rays(pose),
+          # None,
+          # chunk=FLAGS.chunk
+        )
+      
+      # raise()
       # continue
       # print(pred_color.shape,pred_color.min(),pred_color.max() )
       # print(pred_distance.shape,pred_distance.min(),pred_distance.max())
@@ -128,11 +218,12 @@ def main(unused_argv):
       im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
       im = (im*255).astype(np.uint8)
 
-      cv2.imwrite(f'{FLAGS.train_dir}/{folder}/{str(batch["file_num"]).zfill(3)}.png',im)
+      # cv2.imwrite(f'{FLAGS.train_dir}/{folder}/{str(batch["file_num"]).zfill(3)}.png',im)
+      cv2.imwrite(f'tmp/{str(i_pose).zfill(3)}.png',im)
 
-      depth = np.array(pred_distance)
-      with open(f'{FLAGS.train_dir}/{folder}/{str(batch["file_num"]).zfill(3)}.npy', 'wb') as f:
-        np.save(f,depth)
+      # depth = np.array(pred_distance)
+      # with open(f'{FLAGS.train_dir}/{folder}/{str(batch["file_num"]).zfill(3)}.npy', 'wb') as f:
+      #   np.save(f,depth)
       # raise()
       continue
 

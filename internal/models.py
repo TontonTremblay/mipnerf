@@ -220,7 +220,7 @@ class MLP(nn.Module):
     return raw_rgb, raw_density
 
 
-def render_image(render_fn, rays, rng, chunk=8192):
+def render_image(render_fn, rays, rng=None, chunk=8192):
   """Render all the pixels of an image (in test mode).
 
   Args:
@@ -234,6 +234,9 @@ def render_image(render_fn, rays, rng, chunk=8192):
     disp: jnp.ndarray, rendered disparity image.
     acc: jnp.ndarray, rendered accumulated weights per pixel.
   """
+  # for rr in rays:
+  #   print(rr.shape)
+
   height, width = rays[0].shape[:2]
   num_rays = height * width
   rays = utils.namedtuple_map(lambda r: r.reshape((num_rays, -1)), rays)
@@ -255,8 +258,15 @@ def render_image(render_fn, rays, rng, chunk=8192):
     # host_count.
     rays_per_host = chunk_rays[0].shape[0] // jax.host_count()
     start, stop = host_id * rays_per_host, (host_id + 1) * rays_per_host
+
+    # print(start)
+    # print(stop)
+    # print(r[start:stop])
+    # raise()
+
     chunk_rays = utils.namedtuple_map(lambda r: utils.shard(r[start:stop]),
                                       chunk_rays)
+    # raise()
     chunk_results = render_fn(rng, chunk_rays)[-1]
     results.append([utils.unshard(x[0], padding) for x in chunk_results])
     # pylint: enable=cell-var-from-loop

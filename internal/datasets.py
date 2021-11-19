@@ -172,7 +172,8 @@ class Dataset(threading.Thread):
       return {
           'pixels': self.images[idx],
           'rays': utils.namedtuple_map(lambda r: r[idx], self.rays),
-          'file_num':self.names[idx]
+          'file_num':name,
+          'res':int(self.resolutions[idx])
       }
 
   # TODO(bydeng): Swap this function with a more flexible camera model.
@@ -227,6 +228,7 @@ class Multicam(Dataset):
     # should now have ['pix2cam', 'cam2world', 'width', 'height'] in self.meta
     images = []
     names = []
+    resolutions = []
     for i_file,fbase in enumerate(self.meta['file_path']):
       fname = os.path.join(self.data_dir, fbase)
       with utils.open_file(fname, 'rb') as imgin:
@@ -235,14 +237,15 @@ class Multicam(Dataset):
       if config.white_bkgd:
         image = image[..., :3] * image[..., -1:] + (1. - image[..., -1:])
 
-      if image.shape[0] == 400:
-        images.append(image[..., :3])
-        names.append(fbase.split("/")[-1])
+      # if image.shape[0] == 400:
+      images.append(image[..., :3])
+      resolutions.append(image.shape[0])
+      names.append(fbase.split("/")[-1])
 
     self.images = images
     self.n_examples = len(self.images)
     self.names=names
-
+    self.resolutions=resolutions
   def _train_init(self, config):
     """Initialize training."""
     self._load_renderings(config)
@@ -278,6 +281,7 @@ class Multicam(Dataset):
           indexing='xy')
 
     xy = [res2grid(w, h) for w, h in zip(width, height)]
+
     pixel_dirs = [np.stack([x, y, np.ones_like(x)], axis=-1) for x, y in xy]
     camera_dirs = [v @ p2c[:3, :3].T for v, p2c in zip(pixel_dirs, pix2cam)]
     directions = [v @ c2w[:3, :3].T for v, c2w in zip(camera_dirs, cam2world)]

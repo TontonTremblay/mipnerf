@@ -135,6 +135,9 @@ def namedtuple_map(fn, tup):
 
 def shard(xs):
   """Split data into shards for multiple devices along the first dimension."""
+
+  # print(xs.shape)
+
   return jax.tree_map(
       lambda x: x.reshape((jax.local_device_count(), -1) + x.shape[1:]), xs)
 
