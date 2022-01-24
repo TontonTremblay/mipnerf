@@ -107,7 +107,8 @@ def main(unused_argv):
       showcase_index = random.randint(random.PRNGKey(step), (), 0, dataset.size)
     for idx in range(dataset.size):
       batch = next(dataset)
-      if not batch['res'] == 400:
+      # if not batch['res'] == 400:
+      if not batch['res'] == 800:
         continue
       print(f'Evaluating {idx+1}/{dataset.size}',batch['file_num'])
       pred_color, pred_distance, pred_acc = models.render_image(

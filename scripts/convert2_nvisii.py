@@ -166,10 +166,28 @@ def main(unused_argv):
   out_test['frames']=[]
 
   scale = 1
+  if "lego" in blenderdir:
+    with open('poses_lego.npy', 'rb') as f:
+      poses = np.load(f)  
+  if "google" in blenderdir:
+    with open('poses_google.npy', 'rb') as f:
+      poses = np.load(f)  
 
-  with open('poses_lego.npy', 'rb') as f:
-    poses = np.load(f)  
+  if "amazon" in blenderdir:
+    with open('poses_amazon.npy', 'rb') as f:
+      poses = np.load(f)  
 
+  if "abc" in blenderdir:
+    with open('poses_abc.npy', 'rb') as f:
+      poses = np.load(f)  
+  
+
+
+  # poses = [[[-9.32621241e-01, -1.68306619e-01,  3.19203198e-01,  3.35528678e-01*5],
+  #           [ 3.60857040e-01, -4.34981942e-01,  8.24968517e-01,  7.08714938e-01*5],
+  #           [-4.47034836e-08,  8.84569824e-01,  4.66407895e-01,  4.44145864e-01*5],
+  #           [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.10000000e+00],]]
+  # poses = [poses[0]]
   out = out_test
   folder_name = 'test'
   
@@ -197,14 +215,14 @@ def main(unused_argv):
         c2w = data["camera_data"]["cam2world"]        
     fr={}
     fr["file_path"]=folder_name+"/"+"{num:05d}".format(num=i_file_name)
-    pose = pose.T
+    pose = np.array(pose).T
     fr["transform_matrix"]=[[pose[0][0],pose[1][0],pose[2][0],pose[3][0]*scale],
                             [pose[0][1],pose[1][1],pose[2][1],pose[3][1]*scale],
                             [pose[0][2],pose[1][2],pose[2][2],pose[3][2]*scale],
                             [pose[0][3],pose[1][3],pose[2][3],pose[3][3]]] 
     # fr["transform_matrix"] = pose 
     out['frames'].append(fr)
-
+    # break
   out_train['aabb'] = [
     [
       data['camera_data']['scene_min_3d_box'][0],
@@ -274,42 +292,43 @@ def main(unused_argv):
   
   import cv2 
 
-  # folder_name = "test"
-  # i_file_name = -1
-  # for image in sorted(glob.glob(os.path.join(blenderdir+"/*.exr"))):
-  #   if 'depth' in image or 'seg' in image:
-  #     continue
-  #   png_file_name = image.split('/')[-1].replace(".exr",'')
+  folder_name = "test"
+  i_file_name = -1
+  for image in sorted(glob.glob(os.path.join(blenderdir+"/*.exr"))):
+    if 'depth' in image or 'seg' in image:
+      continue
+    png_file_name = image.split('/')[-1].replace(".exr",'')
 
-  #   # if os.path.isfile(f"{outdir}/{folder_name}/{png_file_name}.png"):
-  #   #   continue
-  #   # raise()
-  #   i_file_name += 1
-  #   # if i_file_name>=100 and i_file_name<105:
-  #   #   folder_name = 'val'
-  #   # elif i_file_name>=105:
-  #   #   folder_name = 'test'
-  #   im = load_rgb_exr(image,resize=800)
-  #   cv2.imwrite(f"{outdir}/{folder_name}/{png_file_name}.png",im)
-    # print(im.shape,im.min(),im.max())
-
-  # near = 1000000000
-  # far = -1000000000
-  # for image in sorted(glob.glob(os.path.join(blenderdir+"/*.depth.exr"))):
-  #   depth = cv2.imread(image,  
-  #           cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH) 
-  #   depth[depth>3.4028235e+37] = 0
-  #   depth[depth<-3.4028235e+37] = 0 
-  #   if depth[depth>0].min() < near:
-  #     near = depth[depth>0].min()
-  #   if depth[depth>0].max() > far:
-  #     far = depth[depth>0].max()
-  # near = near - near*.2
-  # far = far + far*.2
+    # if os.path.isfile(f"{outdir}/{folder_name}/{png_file_name}.png"):
+    #   continue
+    # raise()
+    i_file_name += 1
+    # if i_file_name>=100 and i_file_name<105:
+    #   folder_name = 'val'
+    # elif i_file_name>=105:
+    #   folder_name = 'test'
+    im = load_rgb_exr(image,resize=800)
+    cv2.imwrite(f"{outdir}/{folder_name}/{png_file_name}.png",im)
+    print(im.shape,im.min(),im.max())
+    break
+    
+  near = 1000000000
+  far = -1000000000
+  for image in sorted(glob.glob(os.path.join(blenderdir+"/*.depth.exr"))):
+    depth = cv2.imread(image,  
+            cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH) 
+    depth[depth>3.4028235e+37] = 0
+    depth[depth<-3.4028235e+37] = 0 
+    if depth[depth>0].min() < near:
+      near = depth[depth>0].min()
+    if depth[depth>0].max() > far:
+      far = depth[depth>0].max()
+  near = near - near*.2
+  far = far + far*.2
   # print(near,far)
   # near = 0.01 
   # far  = 3
-  near, far = 0.3694779872894287, 1.2352559566497803
+  # near, far = 0.3694779872894287, 1.2352559566497803
 
   # raise() 
   # blenderdir = blenderdir + "/mip"
