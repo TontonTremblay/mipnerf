@@ -35,7 +35,7 @@ path_checkpoints = "/home/jtremblay/code/ngc/results/google/"
 path_data = "/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/nvisii_mvs_10/abc/"
 path_checkpoints = "/home/jtremblay/code/ngc/results/abc/"
 
-print('hello')
+# print('hello')
 for i_folder,folder in enumerate(sorted(glob.glob(path_checkpoints + "*/"))):
 	checkpoint = glob.glob(folder+"*/")[0]
 	if os.path.exists(f'{checkpoint}/500k/checkpoint_500000'):

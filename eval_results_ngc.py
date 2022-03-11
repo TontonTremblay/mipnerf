@@ -80,27 +80,30 @@ import os
 
 # raise()
 
-# path_data = "/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/nvisii_mvs_10/lego/"
-# path_checkpoints = "/home/jtremblay/code/ngc/results/lego/"
+path_data = "/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/nvisii_mvs_10/lego/"
+path_checkpoints = "/home/jtremblay/code/ngc/results/lego/"
 
-# print('hello')
-# folders_lego = sorted(glob.glob(path_data + "*/"))
-# for i_folder,folder in enumerate(sorted(glob.glob(path_checkpoints + "*/"))):
-# 	checkpoint = glob.glob(folder+"*/")[0]
-# 	# num = folder.split("/")[-2]
-# 	if not os.path.exists(f"{folders_lego[i_folder]}/mip/"):
-# 		subprocess.call(['python',"scripts/convert_ndds_data.py",
-# 			"--blenderdir",
-# 			f"{folders_lego[i_folder]}",
-# 			'--outdir',
-# 			f"{folders_lego[i_folder]}/mip/"
-# 			])
+print('hello')
+folders_lego = sorted(glob.glob(path_data + "*/"))
+for i_folder,folder in enumerate(sorted(glob.glob(path_checkpoints + "*/"))):
+	checkpoint = glob.glob(folder+"*/")[0]
+	# if not "Oak" in  folder:
+	# 	continue
+	print(folder)
+	# num = folder.split("/")[-2]
+	if not os.path.exists(f"{folders_lego[i_folder]}/mip/"):
+		subprocess.call(['python',"scripts/convert_ndds_data.py",
+			"--blenderdir",
+			f"{folders_lego[i_folder]}",
+			'--outdir',
+			f"{folders_lego[i_folder]}/mip/"
+			])
 
-# 	subprocess.call([
-# 		"python","eval.py",'--save_output',
-# 		'--data_dir',f"{folders_lego[i_folder]}/mip/",
-# 		'--train_dir',checkpoint
-# 		])
+	subprocess.call([
+		"python","eval.py",'--save_output',
+		'--data_dir',f"{folders_lego[i_folder]}/mip/",
+		'--train_dir',checkpoint
+		])
 
 
 # XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda-11.4/ 

@@ -80,7 +80,7 @@ def main(unused_argv):
   print(config.render_path)
   print('test_preds')
 
-  folder = 'test_500k'
+  folder = 'towaki'
   subprocess.call(['mkdir',f'{FLAGS.train_dir}/{folder}/'])
 
 
@@ -108,6 +108,9 @@ def main(unused_argv):
     for idx in range(dataset.size):
       batch = next(dataset)
       # if not batch['res'] == 400:
+      # if not str(batch["file_num"]).zfill(3) == "044":
+        # continue
+
       if not batch['res'] == 800:
         continue
       print(f'Evaluating {idx+1}/{dataset.size}',batch['file_num'])

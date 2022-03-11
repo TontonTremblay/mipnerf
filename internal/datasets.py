@@ -58,6 +58,7 @@ class Dataset(threading.Thread):
 
   def __init__(self, split, data_dir, config):
     super(Dataset, self).__init__()
+
     self.queue = queue.Queue(3)  # Set prefetch buffer to 3 batches.
     self.daemon = True
     self.split = split
@@ -68,6 +69,7 @@ class Dataset(threading.Thread):
       self._train_init(config)
     elif split == 'test':
       self._test_init(config)
+
     else:
       raise ValueError(
           'the split argument should be either \'train\' or \'test\', set'
@@ -200,7 +202,10 @@ class Dataset(threading.Thread):
     # Cut the distance in half, and then round it out so that it's
     # halfway between inscribed by / circumscribed about the pixel.
 
-    radii = dx[..., None] * 2 / np.sqrt(12)
+    # radii = dx[..., None] * 2 / np.sqrt(12)
+    print(dx[..., None] * 2 / np.sqrt(12))
+    raise()
+    radii = np.ones(dx.shape)*1 
 
     ones = np.ones_like(origins[..., :1])
     self.rays = utils.Rays(
@@ -263,6 +268,7 @@ class Multicam(Dataset):
     self.rays = utils.namedtuple_map(flatten, self.rays)
 
   def _test_init(self, config):
+
     self._load_renderings(config)
     self._generate_rays()
     self.it = 0
@@ -310,7 +316,10 @@ class Multicam(Dataset):
     dx = [np.concatenate([v, v[-2:-1, :]], 0) for v in dx]
     # Cut the distance in half, and then round it out so that it's
     # halfway between inscribed by / circumscribed about the pixel.
+    # radii = [v[..., None] * 2 / np.sqrt(12) for v in dx]
     radii = [v[..., None] * 2 / np.sqrt(12) for v in dx]
+    # print(radii)
+    # radii = [np.ones(v[..., None].shape)*0.0175 for v in dx]
 
     self.rays = utils.Rays(
         origins=origins,
@@ -352,8 +361,8 @@ class Blender(Dataset):
       images.append(image)
     self.images = np.stack(images, axis=0)
     if config.white_bkgd:
-      print('hello')
-      # raise()
+      print('blender')
+      raise()
       self.images = (
           self.images[..., :3] * self.images[..., -1:] +
           (1. - self.images[..., -1:]))
@@ -369,7 +378,7 @@ class Blender(Dataset):
     self.focal = .5 * self.w / np.tan(.5 * camera_angle_x)
     self.n_examples = self.images.shape[0]
     print(self.n_examples)
-    raise()
+    # raise()
 
 class LLFF(Dataset):
   """LLFF Dataset."""
