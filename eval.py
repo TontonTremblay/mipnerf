@@ -110,7 +110,7 @@ def main(unused_argv):
       # if not batch['res'] == 400:
       # if not str(batch["file_num"]).zfill(3) == "044":
         # continue
-
+      # print(batch.keys())
       if not batch['res'] == 800:
         continue
       print(f'Evaluating {idx+1}/{dataset.size}',batch['file_num'])
